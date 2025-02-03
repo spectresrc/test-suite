@@ -1,0 +1,13 @@
+# extensions
+*.code-workspace
+*.log
+
+# npm
+package-lock.json
+node_modules/
+dist/
+
+# app
+*.env.local
+logs/
+.cache/
