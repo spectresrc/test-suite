@@ -2,9 +2,10 @@ export const user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit
 
 export const proxy = null;
 // export const proxy = {
-//   host: 'http://my.superproxychannel.com:3128',
-//   auth: 'hgun77:0|@A}E<5',
+//   host: 'http://43.217.54.162:3128',
+//   auth: 'hgun77:asdasd',
 // };
+
 
 export const headless = false; // 'new'
 export const args = [
@@ -50,7 +51,7 @@ export const args = [
 
 export const option = {
   executablePath: '/usr/bin/google-chrome',
-  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   timeout: 0,
   protocolTimeout: 0,
   headless,
