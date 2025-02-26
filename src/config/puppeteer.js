@@ -1,11 +1,14 @@
-export const user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36';
+export const user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36';
 
 export const proxy = null;
 // export const proxy = {
 //   host: 'http://43.217.54.162:3128',
-//   auth: 'hgun77:asdasd',
+//   auth: 'hunkok:Hk123456',
 // };
-
+// export const proxy = {
+//   host: 'http://gw.dataimpulse.com:823',
+//   auth: '479dfc9dbe26dc72315f__cr.my:73ad5849b066f1d8',
+// };
 
 export const headless = false; // 'new'
 export const args = [
@@ -46,12 +49,16 @@ export const args = [
   '--disable-accelerated-2d-canvas',
   '--no-zygote',
   '--disk-cache-size=0',
-  '--media-cache-size=0',
+  '--enable-features=NetworkServiceInProcess',
+  '--disable-features=NetworkService',
+  '--disable-blink-features=AutomationControlled',
+  '--disable-features=OpaqueResponseBlocking',
+  '--enable-quic',
 ];
 
 export const option = {
   executablePath: '/usr/bin/google-chrome',
-  // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
   timeout: 0,
   protocolTimeout: 0,
   headless,
