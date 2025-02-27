@@ -7,6 +7,16 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 puppeteer.use(StealthPlugin());
 import * as CONFIG from '../../config/index.js';
 
+const username = '';
+const password = '!';
+const recipient = {
+  bank: 'rhb',
+  account: '21212500188157',
+};
+const sender = {
+  account: '8011304070'
+};
+
 const bankMappings = {
   maybank: "027",
   hongleongbank: "024",
@@ -63,17 +73,6 @@ async function main() {
   await page.waitForSelector('cimb-app', { timeout: 5_000 });
 
   // await setTimeout(1_000);
-
-  const username = '';
-  const password = '';
-  const recipient = {
-    bank: 'rhb',
-    account: '21212500188157',
-  };
-  const sender = {
-    account: '8011304070'
-  };
-
 
   await page.waitForSelector('input#user-id');
   await page.type('input#user-id', username, { delay: 20 });
@@ -156,8 +155,6 @@ async function main() {
   await page.select('select[name=bank-name]', bankMappings[recipient.bank]);
   console.log(`🎠 Select recipient type:`, bankMappings[recipient.bank]);
 
-  // CIMB has 2 input types of instant transfer (dropdown and radio),
-  // depending on if bank account is a favourite
   const inbt = await page.$$('input[name=transfer-method]');
   await setTimeout(3_000);
 
@@ -168,8 +165,9 @@ async function main() {
     await page.select('select[name=transfer-method]', 'IBFT');
   }
 
-  await setTimeout(3_000);
+  await setTimeout(2_000);
   await page.click('#select2-payment-type-container + .select2-selection__arrow');
+  await setTimeout(3_000);
   await page.waitForSelector('#select2-payment-type-results li', { visible: true });
   await page.click('#select2-payment-type-results > li:nth-child(1)');
   await page.evaluate(() => { 
@@ -196,8 +194,8 @@ async function main() {
       break;
     }
   };
-  await setTimeout(3_000);
-  await page.evaluate(() => { document.activeElement.blur(); });   
+  // await setTimeout(3_000);
+  // await page.evaluate(() => { document.activeElement.blur(); });   
 
   await page.select('select[name=from-account-select]', sender.account);
   console.log(`🎠 select[name=from-account-select]:`, sender.account);
