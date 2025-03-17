@@ -1,13 +1,11 @@
 import _ from 'lodash';
 import { DateTime } from 'luxon';
 import { setTimeout } from "node:timers/promises";
-import puppeteer from 'puppeteer';
-// import puppeteer from 'puppeteer-extra';
-// import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-// puppeteer.use(StealthPlugin());
-import * as CONFIG from '../../config/index.js';
+import { chromium } from 'playwright-extra';
+import stealth from 'puppeteer-extra-plugin-stealth';
+// import * as CONFIG from '../../config/index.js';
 
-const username = 'accelerate';
+const username = 'visxxxx';
 const password = '';
 const recipient = {
   bank: 'rhb',
@@ -17,66 +15,102 @@ const sender = {
   account: '123123123'
 };
 
-const bankMappings = {
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36';
+const args = [
+  // '--executablePath=',
+  `--window-size=1920,1080`,
+  '--no-sandbox',
+  '--no-zygote',
+  '--disable-setuid-sandbox',
+  '--disable-infobars',
+  '--window-position=0,0',
+  '--ignore-certifcate-errors',
+  '--ignore-certifcate-errors-spki-list',
+  `--start-maximized`,
+  '--disable-background-networking',
+  '--disable-client-side-phishing-detection',
+  '--disable-default-apps',
+  '--disable-hang-monitor',
+  '--disable-popup-blocking',
+  '--disable-prompt-on-repost',
+  '--disable-background-timer-throttling',
+  '--disable-renderer-backgrounding',
+  '--disable-backgrounding-occluded-windows',
+  '--disable-dev-shm-usage',
+  '--disable-sync',
+  '--disable-translate',
+  '--disable-notifications',
+  '--metrics-recording-only',
+  '--no-first-run',
+  '--safebrowsing-disable-auto-update',
+  '--enable-automation',
+  '--password-store=basic',
+  '--use-mock-keychain',
+  '--force-color-profile=srgb',
+  '--disable-gpu',
+  '--disable-3d-apis',
+  '--hide-scrollbars',
+  '--mute-audio',
+  '--disable-accelerated-2d-canvas',
+  '--no-zygote',
+  '--disk-cache-size=0',
+  '--enable-features=NetworkServiceInProcess',
+  '--disable-features=NetworkService',
+  '--disable-blink-features=AutomationControlled',
+  '--disable-features=OpaqueResponseBlocking',
+  '--enable-quic',
+];
+const launch = {
+  executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  headless: false,
+  permissions: ['notifications'],
+  userAgent,
+  args,
+};
 
+const proxy = {
+  server: 'http://43.217.54.162:3128',
+  // auth: 'hunkok:Hk123456',
+  username: 'hunkok',
+  password: 'Hk123456',
 };
 
 async function main() {
   console.log(`🕛`, `${DateTime.now().toSQL()}`);
   console.log(`🔆 Start Troubleshoot`);
 
-  // if (CONFIG.puppeteer.proxy) {
-  //   console.log(`😎 PROXY LOGIN detected:`, CONFIG.puppeteer.proxy.host);
-  //   CONFIG.puppeteer.option.args.push(`--proxy-server=${CONFIG.puppeteer.proxy.host}`);
+  // chromium.use(stealth());
+
+  // if (proxy) {
+  //   console.log(`😎 PROXY LOGIN detected:`, proxy.server);
+  //   launch.proxy = _.pick(proxy, ['server', 'username', 'password']);
   // }
 
-  const browser = await puppeteer.launch(CONFIG.puppeteer.option);
-  const pages = await browser.pages();
-  const page = pages.shift();
-
+  const browser = await chromium.launch(launch);
+  const page = await browser.newPage();
   const version = await browser.version();
   console.log(`😎 Chrome version:`, version);
-  console.log(`😎 user_agent:`, CONFIG.puppeteer.user_agent);
-  console.log(`😎 CONFIG.puppeteer.option:`, CONFIG.puppeteer.option);
+  console.log(`😎 CONFIG.launch:`, launch);
 
-  page.setUserAgent(CONFIG.puppeteer.user_agent);
   // await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
-  page.on("dialog", (dialog) => dialog.accept());
-
-  // if (CONFIG.puppeteer.proxy) {
-  //   const [username, password] = CONFIG.puppeteer.proxy.auth.split(':');
-  //   await page.authenticate({ username, password });
-  //   console.log(`😎 PROXY LOGIN authenticated:`, CONFIG.puppeteer.proxy.host, { username, password });
-  // }
+  page.on('dialog', async (dialog) => await dialog.accept());
 
   // get current ip address
-  const ip = await page.goto('https://checkip.amazonaws.com/', { waitUntil: ['networkidle0'], timeout: 5_000 });
+  const ip = await page.goto('https://checkip.amazonaws.com/', { timeout: 5_000 });
   console.log(`😎 IP Address:`, (await ip.text()).trim());
-
-  // await page.goto('https://api.ipify.org/', { timeout: 60000, waitUntil: ['networkidle0', 'networkidle2'] });
-  // await page.goto('https://scrapfly.io/web-scraping-tools/http2-fingerprint', { timeout: 60000, waitUntil: ['networkidle0', 'networkidle2'] });
-  // await page.goto('https://scrapfly.io/web-scraping-tools/ja3-fingerprint', { timeout: 60000, waitUntil: ['networkidle0', 'networkidle2'] });
-
+  // await page.goto('https://api.ipify.org/', { timeout: 5_000 });
+  // await page.goto('https://scrapfly.io/web-scraping-tools/http2-fingerprint', { timeout: 5_000 });
+  // await page.goto('https://scrapfly.io/web-scraping-tools/ja3-fingerprint', { timeout: 5_000 });
+  await setTimeout(2_000);
   const URL = 'https://www.maybank2u.com.my/home/m2u/common/login.do';
+  await page.goto(URL, { timeout: 15_000 });
+  await page.locator('input#username').pressSequentially(username, { delay: 120 });
+  // await page.locator('input#username').fill(username);
+  await page.keyboard.press('Tab');
+  await setTimeout(2_000);
+  await page.keyboard.press('Space');
+  // await page.locator('button[class^=LoginUsername---login-button]').click();
 
-  await page.goto(URL, { waitUntil: ['networkidle0'], timeout: 15_000 });
-  await page.waitForSelector('button[class^=LoginUsername---login-button]', { visible: true, timeout: 3_000 });
-
-  await page.click('input#username');
-  await page.type('input#username', username, { delay: 20 });
-  // await setTimeout(3_000);
-  await page.click('button[class^=LoginUsername---login-button]');
-  // document.querySelector('button[class^=LoginUsername---login-button]').click();
-
-  // await setTimeout(3_000);
-  // await page.evaluate(() => {
-  //   document.querySelector('input#username').click();
-  //   document.querySelector('input#username').blur();
-  //   document.querySelector('button[class^=LoginUsername---login-button]').click();
-  // });
-
-  // await page.waitForSelector('div[class*=SecurityPhrase---container]', { visible: true, timeout: 17_000 });
-  // await page.click('div[class*=SecurityPhrase---right-btn-container] > button');
 }
 
 main();

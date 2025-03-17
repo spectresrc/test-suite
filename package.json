@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node src/banks/my/cimb.js"
+    "start": "node src/banks/my/maybank.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
@@ -12,7 +12,9 @@
     "lodash": "^4.17.21",
     "luxon": "^3.5.0",
     "path": "^0.12.7",
-    "puppeteer": "24.3.0",
+    "playwright": "^1.51.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer": "24.4.0",
     "puppeteer-extra": "3.3.6",
     "puppeteer-extra-plugin-stealth": "2.11.2",
     "rxjs": "^7.8.2"
@@ -20,6 +22,5 @@
   "devDependencies": {
     "nodemon": "^3.1.9",
     "typescript": "^5.7.3"
-  },
-  "optionalDependencies": {}
+  }
 }
