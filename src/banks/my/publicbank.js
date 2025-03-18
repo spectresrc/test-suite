@@ -6,15 +6,23 @@ import * as CONFIG from '../../config/index.js';
 const username = 'hgun77';
 const password = 'On$4669668';
 const recipient = {
-  bank: 'rhb',
-  account: '21212500188157',
+  bank: 'maybank',
+  account: '107171021537',
 };
 const sender = {
-  account: '123123123'
+  account: '4483829319'
 };
 
 const bankMappings = {
-
+  cimb: "501855",
+  maybank: "588734",
+  hongleongbank: "588830",
+  rhb: "564160",
+  bsn: "420709",
+  ambank: "564169",
+  ocbcmy: "504324",
+  affinbank: "501664",
+  alliancebank: "504374"
 };
 
 async function main() {
@@ -71,7 +79,7 @@ async function main() {
   await page.type('input[name=password]', password);
   await page.click('#SubmitBtn');
 
-  await new Promise(_ => setTimeout(_, 2_000));
+  await new Promise(_ => setTimeout(_, 1_000));
 
   try {
     await page.waitForSelector('#DuplicateLoginDialog', { timeout: 3_000 });
@@ -90,12 +98,10 @@ async function main() {
   {
     console.log('🔆 Click on Account');
     // last resort to use page.evaluate
-    await page.evaluate(() => {
-      document.querySelectorAll('.tiles a')[0].click();
-    });
+    await page.evaluate(() => document.querySelectorAll('.tiles a')[0].click());
   }
 
-  await new Promise(_ => setTimeout(_, 2_000));
+  await new Promise(_ => setTimeout(_, 1_000));
 
   {
     console.log('🔆 Click on Fund Transfer');
@@ -103,33 +109,68 @@ async function main() {
     await page.click('.top-menu a:nth-child(3)');
   }
 
-  await new Promise(_ => setTimeout(_, 2_000));
+  await new Promise(_ => setTimeout(_, 1_000));
 
   {
     console.log('🔆 Click on Other Bank Account');
     await page.waitForSelector('ul.page-sidebar-menu>li', { timeout: 2_000 });
-    const [link] = await page.$$x("//a[.//span[@class='title' and normalize-space()='Other Bank Account']]");
-    if (link) await link.click();
+    await page.evaluate(() => {
+      const exp = "//a[.//span[@class='title' and normalize-space()='Other Bank Account']]";
+      const query = document.evaluate(exp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (query.singleNodeValue) { query.singleNodeValue.click() };
+    });
   }
 
-  await new Promise(_ => setTimeout(_, 2_000));
+  await new Promise(_ => setTimeout(_, 1_000));
 
   {
     console.log('🔆 Click on DuitNow Transfer');
     await page.waitForSelector('ul.page-sidebar-menu>li', { timeout: 2_000 });
-    const [link] = await page.$$x("//a[.//span[@class='title' and normalize-space()='DuitNow Transfer']]");
-    if (link) await link.click();
+    await page.evaluate(() => {
+      const exp = "//a[.//span[@class='title' and normalize-space()='DuitNow Transfer']]";
+      const query = document.evaluate(exp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (query.singleNodeValue) { query.singleNodeValue.click() };
+    });
   }
 
-  await new Promise(_ => setTimeout(_, 2_000));
+  await new Promise(_ => setTimeout(_, 1_000));
 
   {
     console.log('🔆 Click on To Other Account');
     await page.waitForSelector('ul.page-sidebar-menu>li', { timeout: 2_000 });
-    const [link] = await page.$$x("//li[@class='open']//ul[@class='sub-menu']//a[normalize-space()='To Other Account']");
-    if (link) await link.click();
+    await page.evaluate(() => {
+      const exp = "//li[@class='open']//ul[@class='sub-menu']//a[normalize-space()='To Other Account']";
+      const query = document.evaluate(exp, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+      if (query.singleNodeValue) { query.singleNodeValue.click() };
+    });
   }
 
+  await page.waitForSelector('.page-container', { timeout: 2_000 });
+
+  await page.select('select[name=FROM_ACC_NO]', `${sender.account}`);
+  await page.select('select[name=TO_BANK_NBR]', bankMappings[recipient.bank]);
+
+  await new Promise(_ => setTimeout(_, 3_000));
+
+  await page.type('input[name=BENE_ACC_NO]', recipient.account);
+  await page.select('select[name=PAYMENT_TYPE]', "00");
+
+  await page.type('input[name=RECIPIENT_REFERENCE]', 'remark');
+  await page.type('input[name=TRANSACTION_AMT]', '30');
+
+  await page.click('#DuitNowTC');
+
+  await page.click('#submitBtn');
+
+  try {
+    await page.waitForSelector('#transferAlert', { visible: true, timeout: 3_000 })
+    await page.click('button[name="reject"]');
+    console.log('🔆 Transfer Alert Found');
+  } catch (error) {
+  
+  }
+
+// <button type="button" class="btn red" id="next2" name="next2" onclick="confirm2FAPN();return false" data-role="none">Confirm</button>
 }
 
 main();
