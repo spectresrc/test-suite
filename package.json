@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node src/banks/my/maybank.js"
+    "start": "node src/banks/my/publicbank.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
