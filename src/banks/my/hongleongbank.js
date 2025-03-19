@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import { DateTime } from 'luxon';
-import puppeteer from 'puppeteer';
-// import puppeteer from 'puppeteer-extra';
-// import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+// import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as CONFIG from '../../config/index.js';
 
-// puppeteer.use(StealthPlugin());
+puppeteer.use(StealthPlugin());
 
-const username = 'siti';
+const username = 'sitisitisiti';
 const password = 'On$4669668';
 const amount = 25;
 const recipient = {
@@ -52,7 +52,7 @@ async function main() {
   console.log(`😎 CONFIG.puppeteer.option:`, CONFIG.puppeteer.option);
 
   page.setUserAgent(CONFIG.puppeteer.user_agent);
-  // await page.setViewport({ width: 1366, height: 768, deviceScaleFactor: 1 });
+
   page.on("dialog", (dialog) => dialog.accept());
 
   if (CONFIG.puppeteer.proxy) {
@@ -70,30 +70,36 @@ async function main() {
   // await page.goto('https://scrapfly.io/web-scraping-tools/http2-fingerprint', { timeout: 60000, waitUntil: ['networkidle0', 'networkidle2'] });
   // await page.goto('https://scrapfly.io/web-scraping-tools/ja3-fingerprint', { timeout: 60000, waitUntil: ['networkidle0', 'networkidle2'] });
 
-  const HONGLEONG_URL = 'https://s.hongleongconnect.my/rib/app/fo/login?mc=D';
+  const HONGLEONG_URL = 'https://s.hongleongconnect.my/rib/app/fo/login';
   const HONGLEONG_TRANSFER_URL = 'https://s.hongleongconnect.my/rib/app/fo/trx/3rdpartytrsf';
 
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, "userAgentData", {
+      get: () => ({ brands: [{ brand: "Google Chrome", version: "134" }] })
+    });
+  });
   await page.goto(HONGLEONG_URL, { waitUntil: 'networkidle0' });
-  return;
-  await page.waitForSelector('#idLoginIdForm');
-
+  
   try {
-    await page.waitForSelector('a.simplemodal-close', { timeout: 1000 });
+    await page.waitForSelector('a.simplemodal-close', { visible: true, timeout: 3_000 });
     await page.click('a.simplemodal-close');
-  }
-  catch (error) { }
-
-  try {
-    await page.type('#idLoginId', username);
-    await page.click('#idBtnSubmit1');
-
-    await page.waitForSelector('.access-loginbox-securepic');
-    await page.evaluate(() => checkConfirmPicText());
-    // await page.type('#idPswd', password);
-    // await page.evaluate(username => { login(username); }, data.username);
+    console.log('🔆 Popup detected');
   } catch (error) {
-    console.error(`❌`, error.message);
+    console.log('🔆 No popup detected');
   }
+
+  await page.waitForSelector('#idLoginIdForm', { visible: true, timeout: 3_000 });
+
+  await page.type('#idLoginId', username);
+  await page.click('#idBtnSubmit1');
+
+  await page.waitForSelector('.access-loginbox-securepic', { visible: true, timeout: 3_000 });
+  await page.evaluate(() => checkConfirmPicText());
+  await page.type('#idPswd', password);
+  await new Promise(_ => setTimeout(_, 1_000));
+  await page.click('#idBtnSubmit2');
+
+  // await page.evaluate(username => { login(username); }, username);
 }
 
 main();

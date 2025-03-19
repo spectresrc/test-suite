@@ -53,6 +53,7 @@ export const args = [
   '--disable-features=NetworkService',
   '--disable-blink-features=AutomationControlled',
   '--disable-features=OpaqueResponseBlocking',
+  '--enable-features=UserAgentClientHint',
   '--enable-quic',
   // '--incognito',
 ];
