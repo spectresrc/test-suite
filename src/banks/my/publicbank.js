@@ -3,14 +3,15 @@ import { DateTime } from 'luxon';
 import puppeteer from 'puppeteer';
 import * as CONFIG from '../../config/index.js';
 
-const username = 'hgun77';
-const password = 'On$4669668';
+const username = 'sitirulain';
+const password = '466On$9668';
+const amount = 25;
 const recipient = {
   bank: 'maybank',
-  account: '107171021537',
+  account: '123',
 };
 const sender = {
-  account: '4483829319'
+  account: '3412'
 };
 
 const bankMappings = {
@@ -79,25 +80,19 @@ async function main() {
   await page.type('input[name=password]', password);
   await page.click('#SubmitBtn');
 
-  await new Promise(_ => setTimeout(_, 1_000));
+  await new Promise(_ => setTimeout(_, 3_000));
 
   try {
     await page.waitForSelector('#DuplicateLoginDialog', { timeout: 3_000 });
-    console.log('Duplicate Login Dialog Found');
-    await page.goto('https://www2.pbebank.com/myIBK/apppbb/servlet/BxxxServlet?RDOName=BxxxAuth&MethodName=duplicateLogin');
-
+    console.log('🔆 Duplicate Login Dialog Found');
+    await page.goto('https://www2.pbebank.com/myIBK/apppbb/servlet/BxxxServlet?RDOName=BxxxAuth&MethodName=duplicateLogin', { waitUntil: 'networkidle0' });
+    await new Promise(_ => setTimeout(_, 3_000));
   } catch (error) {
-    console.log('No Duplicate Login Dialog');
+    console.log('🔆 No Duplicate Login Dialog');
   };
-
-  // javascript:location.href='https://www2.pbebank.com/myIBK/apppbb/servlet/BxxxServlet?RDOName=BxxxAuth&MethodName=duplicateLogin'
-  // https://www2.pbebank.com/myIBK/apppbb/servlet/BxxxServlet?RDOName=BxxxAuth&MethodName=duplicateLogin
-
-  await new Promise(_ => setTimeout(_, 5_000));
 
   {
     console.log('🔆 Click on Account');
-    // last resort to use page.evaluate
     await page.evaluate(() => document.querySelectorAll('.tiles a')[0].click());
   }
 
@@ -156,7 +151,7 @@ async function main() {
   await page.select('select[name=PAYMENT_TYPE]', "00");
 
   await page.type('input[name=RECIPIENT_REFERENCE]', 'remark');
-  await page.type('input[name=TRANSACTION_AMT]', '30');
+  await page.type('input[name=TRANSACTION_AMT]', `${amount}`);
 
   await page.click('#DuitNowTC');
 
@@ -164,13 +159,26 @@ async function main() {
 
   try {
     await page.waitForSelector('#transferAlert', { visible: true, timeout: 3_000 })
-    await page.click('button[name="reject"]');
+    await page.click('#transferAlert button[name="reject"]');
     console.log('🔆 Transfer Alert Found');
   } catch (error) {
-  
+    console.log('🔆 Transfer Alert Not Found');
   }
 
-// <button type="button" class="btn red" id="next2" name="next2" onclick="confirm2FAPN();return false" data-role="none">Confirm</button>
+  try {
+    await page.waitForSelector('#dupTranAlert', { timeout: 3_000 })
+    await page.waitForSelector('#dupTranAlert button[name="reject"]', { visible: true, timeout: 3_000 })
+    await page.click('#dupTranAlert button[name="reject"]');
+    console.log('🔆 Duplicate Alert Found');
+  } catch (error) {
+    console.error(error.message);
+    console.log('🔆 Duplicate Alert Not Found');
+  }
+
+  // await page.waitForSelector('#next2', { visible: true, timeout: 3_000 })
+  // await page.click('#next2');
+
+  // <button type="button" class="btn red" id="next2" name="next2" onclick="confirm2FAPN();return false" data-role="none">Confirm</button>
 }
 
 main();

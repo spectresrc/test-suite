@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "start": "node src/banks/my/publicbank.js"
+    "start": "node src/banks/my/hongleongbank.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
