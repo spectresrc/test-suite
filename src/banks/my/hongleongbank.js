@@ -7,12 +7,12 @@ import * as CONFIG from '../../config/index.js';
 
 puppeteer.use(StealthPlugin());
 
-const username = 'sitisitisiti';
-const password = 'On$4669668';
-const amount = 25;
+const username = 'Siti94food';
+const password = 'Stst888!';
+const amount = 1;
 const recipient = {
   bank: 'maybank',
-  account: '107171021537',
+  account: '123',
 };
 const sender = {
   account: '4483829319'
@@ -79,7 +79,7 @@ async function main() {
     });
   });
   await page.goto(HONGLEONG_URL, { waitUntil: 'networkidle0' });
-  
+
   try {
     await page.waitForSelector('a.simplemodal-close', { visible: true, timeout: 3_000 });
     await page.click('a.simplemodal-close');
@@ -97,9 +97,40 @@ async function main() {
   await page.evaluate(() => checkConfirmPicText());
   await page.type('#idPswd', password);
   await new Promise(_ => setTimeout(_, 1_000));
-  await page.click('#idBtnSubmit2');
 
+  await page.click('#idBtnSubmit2');
   // await page.evaluate(username => { login(username); }, username);
+
+  await page.waitForSelector('#idMainFrame', { timeout: 5_000 });
+  const url = await page.$eval('#idMainFrame', el => el.src);
+  console.log('🔆 url:', url);
+  await page.goto(url, { waitUntil: 'networkidle2' });
+
+  const senderNameElem = await page.$eval("#idEmailPanel strong", e => e.textContent);
+  const senderName = senderNameElem.replace(/welcome/gi, '').trim();
+  console.log(`🔆 Sender Name:`, senderName);
+
+  const accounts = await page.$$eval('tbody[id^=j_idt][id$=_data] > tr, #idDTCasa_data > tr', (trs) =>
+    trs.map((tr) => {
+      console.log(`🔆 tr:`, tr);
+
+      const columns = tr.querySelectorAll('td');
+      console.log(`🔆 columns:`, columns);
+
+      const accountName = columns[0].querySelector('.accname')?.textContent;
+      const accountNumber = columns[0].querySelector('a')?.textContent;
+      const availableBalance = columns[1]?.textContent.trim();
+
+      return {
+        type: accountName,
+        account: accountNumber,
+        available: availableBalance,
+      };
+    })
+  );
+
+  console.log(`🔆 accounts:`, accounts);
+
 }
 
 main();
